@@ -1,4 +1,54 @@
-#id {
+#board {
   display: grid;
   grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  background: #000;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
+
+.empty {
+  background-color: black;
+}
+
+.wall {
+  background-color: blue;
+  height: 100%;
+  width: 100%;
+}
+
+.dot {
+  background-color: burlywood;
+  height: 6px;
+  width: 6px;
+  border-radius: 50px;
+}
+
+.pellet {
+  background-color: blanchedalmond;
+  height: 10px;
+  width: 10px;
+  border-radius: 50px;
+}
+
+.pacman {
+  background-color: yellow;
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+}
+
+.ghost {
+  background-color: aqua;
+  height: 20px;
+  width: 20px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
