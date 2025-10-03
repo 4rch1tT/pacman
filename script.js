@@ -17,6 +17,15 @@ let cellElement = []; // for references. eg: cellElement[1][1] will be the pelle
 let pacmanPos = { row: 7, col: 5 };
 let ghostPos = { row: 3, col: 3 };
 
+let currentDirection = "right";
+let nextDirection = null;
+let target = {};
+
+let interval = null;
+
+let score = 0;
+let lives = 3;
+
 // render the board
 function renderBoard(grid) {
   // clear all board if it exists
@@ -64,19 +73,76 @@ function renderBoard(grid) {
 
 renderBoard(gridArray);
 
-// render the entities i.e pacman and ghost it is dynamic
-function renderEntities() {
+// render the entities i.e pacman and ghost (dynamic)
+function renderPacman() {
   const pacCell = cellElement[pacmanPos.row][pacmanPos.col];
   const pacDiv = document.createElement("div");
   pacDiv.classList.add("pacman");
   pacCell.appendChild(pacDiv);
+}
 
+function renderGhost() {
   const ghostCell = cellElement[ghostPos.row][ghostPos.col];
   const ghostDiv = document.createElement("div");
   ghostDiv.classList.add("ghost");
   ghostCell.appendChild(ghostDiv);
 }
 
-renderEntities();
+renderPacman();
+renderGhost();
 
+// setting keyboard events
+document.addEventListener("keydown", (event) => {
+  if (event.key.startsWith("Arrow") && interval === null) {
+    interval = setInterval(gameLoop, 150);
+  }
+  if (event.key === "ArrowUp") nextDirection = "up";
+  if (event.key === "ArrowDown") nextDirection = "down";
+  if (event.key === "ArrowLeft") nextDirection = "left";
+  if (event.key === "ArrowRight") nextDirection = "right";
+});
 
+function gameLoop() {
+  if (nextDirection !== null && canMove(pacmanPos, nextDirection)) {
+    currentDirection = nextDirection;
+  }
+
+  if (canMove(pacmanPos, currentDirection)) {
+    cellElement[pacmanPos.row][pacmanPos.col]
+      .querySelector(".pacman")
+      ?.remove();
+
+    pacmanPos = getNewPosition(pacmanPos, currentDirection);
+
+    if (cellElement[pacmanPos.row][pacmanPos.col].querySelector(".dot")) {
+      cellElement[pacmanPos.row][pacmanPos.col].querySelector(".dot")?.remove();
+      gridArray[pacmanPos.row][pacmanPos.col] = 0;
+      score += 10;
+    }
+
+    if (cellElement[pacmanPos.row][pacmanPos.col].querySelector(".pellet")) {
+      cellElement[pacmanPos.row][pacmanPos.col]
+        .querySelector(".pellet")
+        ?.remove();
+      gridArray[pacmanPos.row][pacmanPos.col] = 0;
+      score += 50;
+    }
+    
+    renderPacman();
+  }
+}
+
+// function to check if the pacman can move
+function canMove(pos, dir) {
+  target = getNewPosition(pos, dir);
+  if (gridArray[target.row][target.col] !== 1) return true;
+  else return false;
+}
+
+// function to set the position
+function getNewPosition(pos, dir) {
+  if (dir == "up") return { row: pos.row - 1, col: pos.col };
+  if (dir == "down") return { row: pos.row + 1, col: pos.col };
+  if (dir == "left") return { row: pos.row, col: pos.col - 1 };
+  if (dir == "right") return { row: pos.row, col: pos.col + 1 };
+}
