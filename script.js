@@ -17,14 +17,24 @@ let cellElement = []; // for references. eg: cellElement[1][1] will be the pelle
 let pacmanPos = { row: 7, col: 5 };
 let ghostPos = { row: 3, col: 3 };
 
-let currentDirection = "right";
-let nextDirection = null;
+let currentPacDirection = "right";
+let nextPacDirection = null;
+// let currentGhostDirection = "right";
+// let nextGhostDirection = null;
 let target = {};
 
 let interval = null;
 
 let score = 0;
+const scoreDiv = document.getElementById("score");
+
+const restartBtn = document.getElementById("restart");
 let lives = 3;
+
+// simple reload (update it more game like --> next step)
+restartBtn.addEventListener("click", () => {
+  location.reload();
+});
 
 // render the board
 function renderBoard(grid) {
@@ -96,23 +106,23 @@ document.addEventListener("keydown", (event) => {
   if (event.key.startsWith("Arrow") && interval === null) {
     interval = setInterval(gameLoop, 150);
   }
-  if (event.key === "ArrowUp") nextDirection = "up";
-  if (event.key === "ArrowDown") nextDirection = "down";
-  if (event.key === "ArrowLeft") nextDirection = "left";
-  if (event.key === "ArrowRight") nextDirection = "right";
+  if (event.key === "ArrowUp") nextPacDirection = "up";
+  if (event.key === "ArrowDown") nextPacDirection = "down";
+  if (event.key === "ArrowLeft") nextPacDirection = "left";
+  if (event.key === "ArrowRight") nextPacDirection = "right";
 });
 
 function gameLoop() {
-  if (nextDirection !== null && canMove(pacmanPos, nextDirection)) {
-    currentDirection = nextDirection;
+  if (nextPacDirection !== null && canMove(pacmanPos, nextPacDirection)) {
+    currentPacDirection = nextPacDirection;
   }
 
-  if (canMove(pacmanPos, currentDirection)) {
+  if (canMove(pacmanPos, currentPacDirection)) {
     cellElement[pacmanPos.row][pacmanPos.col]
       .querySelector(".pacman")
       ?.remove();
 
-    pacmanPos = getNewPosition(pacmanPos, currentDirection);
+    pacmanPos = getNewPosition(pacmanPos, currentPacDirection);
 
     if (cellElement[pacmanPos.row][pacmanPos.col].querySelector(".dot")) {
       cellElement[pacmanPos.row][pacmanPos.col].querySelector(".dot")?.remove();
@@ -127,9 +137,10 @@ function gameLoop() {
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       score += 50;
     }
-    
+
     renderPacman();
   }
+  scoreDiv.textContent = "Score:" + score;
 }
 
 // function to check if the pacman can move
@@ -139,10 +150,26 @@ function canMove(pos, dir) {
   else return false;
 }
 
-// function to set the position
+// function to set the position of pacman
 function getNewPosition(pos, dir) {
   if (dir == "up") return { row: pos.row - 1, col: pos.col };
   if (dir == "down") return { row: pos.row + 1, col: pos.col };
   if (dir == "left") return { row: pos.row, col: pos.col - 1 };
   if (dir == "right") return { row: pos.row, col: pos.col + 1 };
+}
+
+function validateGhostDir(ghostPos) {
+  let ghostDirections = [];
+  if (gridArray[ghostPos.row - 1][ghostPos.col] !== 1) {
+    ghostDirections.push("up");
+  }
+  if (gridArray[ghostPos.row + 1][ghostPos.col] !== 1) {
+    ghostDirections.push("down");
+  }
+  if (gridArray[ghostPos.row][ghostPos.col - 1] !== 1) {
+    ghostDirections.push("left");
+  }
+  if (gridArray[ghostPos.row][ghostPos.col + 1] !== 1) {
+    ghostDirections.push("right");
+  }
 }
