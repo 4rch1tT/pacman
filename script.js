@@ -19,16 +19,14 @@ let ghostPos = { row: 3, col: 3 };
 
 let currentPacDirection = "right";
 let nextPacDirection = null;
-// let currentGhostDirection = "right";
-// let nextGhostDirection = null;
-let target = {};
 
+let target = {};
 let interval = null;
 
 let score = 0;
 const scoreDiv = document.getElementById("score");
-
 const restartBtn = document.getElementById("restart");
+
 let lives = 3;
 
 // simple reload (update it more game like --> next step)
@@ -140,6 +138,12 @@ function gameLoop() {
 
     renderPacman();
   }
+  cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove()
+  const validGhostDirections = getValidGhostDir(ghostPos);
+  const randomGhostDir = getRandomGhostDir(validGhostDirections);
+
+  ghostPos = getNewPosition(ghostPos, randomGhostDir);
+  renderGhost()
   scoreDiv.textContent = "Score:" + score;
 }
 
@@ -158,7 +162,8 @@ function getNewPosition(pos, dir) {
   if (dir == "right") return { row: pos.row, col: pos.col + 1 };
 }
 
-function validateGhostDir(ghostPos) {
+// function to find out the valid directions ghost can move
+function getValidGhostDir(ghostPos) {
   let ghostDirections = [];
   if (gridArray[ghostPos.row - 1][ghostPos.col] !== 1) {
     ghostDirections.push("up");
@@ -172,4 +177,12 @@ function validateGhostDir(ghostPos) {
   if (gridArray[ghostPos.row][ghostPos.col + 1] !== 1) {
     ghostDirections.push("right");
   }
+  return ghostDirections;
+}
+
+// function to take one random direcrion from the validDirections array 
+function getRandomGhostDir(validGhostDirections) {
+  const randomIndex = Math.floor(Math.random() * validGhostDirections.length);
+
+  return validGhostDirections[randomIndex];
 }
