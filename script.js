@@ -17,17 +17,24 @@ let cellElement = []; // for references. eg: cellElement[1][1] will be the pelle
 let pacmanPos = { row: 7, col: 5 };
 let ghostPos = { row: 3, col: 3 };
 
+let pacmanAlive = true;
+let gameState = "running";
+
 let currentPacDirection = "right";
 let nextPacDirection = null;
 
 let target = {};
 let interval = null;
 
-let score = 0;
-const scoreDiv = document.getElementById("score");
 const restartBtn = document.getElementById("restart");
 
+let score = 0;
+const scoreDiv = document.getElementById("score");
+
 let lives = 3;
+const livesDiv = document.getElementById("lives");
+
+const gameOverDiv = document.getElementById("game-over");
 
 // simple reload (update it more game like --> next step)
 restartBtn.addEventListener("click", () => {
@@ -81,7 +88,7 @@ function renderBoard(grid) {
 
 renderBoard(gridArray);
 
-// render the entities i.e pacman and ghost (dynamic)
+// functions to render the entities i.e pacman and ghost (dynamic)
 function renderPacman() {
   const pacCell = cellElement[pacmanPos.row][pacmanPos.col];
   const pacDiv = document.createElement("div");
@@ -95,8 +102,9 @@ function renderGhost() {
   ghostDiv.classList.add("ghost");
   ghostCell.appendChild(ghostDiv);
 }
-
-renderPacman();
+if (pacmanAlive) {
+  renderPacman();
+}
 renderGhost();
 
 // setting keyboard events
@@ -111,6 +119,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 function gameLoop() {
+  if (gameState !== "running") {
+    return;
+  }
   if (nextPacDirection !== null && canMove(pacmanPos, nextPacDirection)) {
     currentPacDirection = nextPacDirection;
   }
@@ -135,15 +146,41 @@ function gameLoop() {
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       score += 50;
     }
-
-    renderPacman();
+    if (pacmanAlive) {
+      renderPacman();
+    }
   }
-  cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove()
+
+  cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove();
   const validGhostDirections = getValidGhostDir(ghostPos);
   const randomGhostDir = getRandomGhostDir(validGhostDirections);
 
   ghostPos = getNewPosition(ghostPos, randomGhostDir);
-  renderGhost()
+  renderGhost();
+
+  if (ghostPos.row === pacmanPos.row && ghostPos.col === pacmanPos.col) {
+    if (pacmanAlive) {
+      lives -= 1;
+      pacmanAlive = false;
+      gameState = "paused";
+      cellElement[pacmanPos.row][pacmanPos.col]
+        .querySelector(".pacman")
+        ?.remove();
+
+      setTimeout(() => {
+        pacmanPos = { row: 7, col: 5 };
+        pacmanAlive = true;
+        gameState = "running";
+      }, 1000);
+    }
+  }
+  if (lives === 0) {
+    pacmanAlive = false;
+    gameState = "gameOver";
+    clearInterval(interval);
+    return (gameOverDiv.textContent = "Game Over:(");
+  }
+  livesDiv.textContent = "Lives:" + lives;
   scoreDiv.textContent = "Score:" + score;
 }
 
@@ -180,7 +217,7 @@ function getValidGhostDir(ghostPos) {
   return ghostDirections;
 }
 
-// function to take one random direcrion from the validDirections array 
+// function to take one random direcrion from the validDirections array
 function getRandomGhostDir(validGhostDirections) {
   const randomIndex = Math.floor(Math.random() * validGhostDirections.length);
 
