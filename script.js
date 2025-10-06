@@ -35,6 +35,7 @@ let lives = 3;
 const livesDiv = document.getElementById("lives");
 
 const gameOverDiv = document.getElementById("game-over");
+const youWinDiv = document.getElementById("you-win");
 
 // simple reload (update it more game like --> next step)
 restartBtn.addEventListener("click", () => {
@@ -137,6 +138,7 @@ function gameLoop() {
       cellElement[pacmanPos.row][pacmanPos.col].querySelector(".dot")?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       score += 10;
+      checkWin();
     }
 
     if (cellElement[pacmanPos.row][pacmanPos.col].querySelector(".pellet")) {
@@ -145,7 +147,9 @@ function gameLoop() {
         ?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       score += 50;
+      checkWin();
     }
+
     if (pacmanAlive) {
       renderPacman();
     }
@@ -166,20 +170,23 @@ function gameLoop() {
       cellElement[pacmanPos.row][pacmanPos.col]
         .querySelector(".pacman")
         ?.remove();
-
+      cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove();
       setTimeout(() => {
         pacmanPos = { row: 7, col: 5 };
+        ghostPos = { row: 3, col: 3 };
         pacmanAlive = true;
         gameState = "running";
       }, 1000);
     }
   }
+
   if (lives === 0) {
     pacmanAlive = false;
     gameState = "gameOver";
     clearInterval(interval);
-    return (gameOverDiv.textContent = "Game Over:(");
+    return (gameOverDiv.textContent = "Game Over :(");
   }
+
   livesDiv.textContent = "Lives:" + lives;
   scoreDiv.textContent = "Score:" + score;
 }
@@ -222,4 +229,14 @@ function getRandomGhostDir(validGhostDirections) {
   const randomIndex = Math.floor(Math.random() * validGhostDirections.length);
 
   return validGhostDirections[randomIndex];
+}
+
+//function to check if there's any dot or pellet left
+function checkWin() {
+  //here we are flattening the whole grid array and checking if any dot or pellet left
+  if (!gridArray.flat().some((cell) => cell === 2 || cell === 3)) {
+    gameState = "youWin";
+    clearInterval(interval);
+    return (youWinDiv.textContent = "You Win ;)");
+  }
 }
