@@ -15,7 +15,10 @@ let boardDiv = document.getElementById("board");
 let cellElement = []; // for references. eg: cellElement[1][1] will be the pellet div no need to loop through to find the elements
 
 let pacmanPos = { row: 7, col: 5 };
-let ghostPos = { row: 3, col: 3 };
+let ghost = {
+  position: { row: 3, col: 3 },
+  mode: "normal",
+};
 
 let pacmanAlive = true;
 let gameState = "running";
@@ -98,11 +101,19 @@ function renderPacman() {
 }
 
 function renderGhost() {
-  const ghostCell = cellElement[ghostPos.row][ghostPos.col];
+  const ghostCell = cellElement[ghost.position.row][ghost.position.col];
   const ghostDiv = document.createElement("div");
   ghostDiv.classList.add("ghost");
+
+  if (ghost.mode === "frightened") {
+    ghostDiv.style.backgroundColor = "#FF1493";
+  } else {
+    ghostDiv.style.backgroundColor = "aqua";
+  }
+
   ghostCell.appendChild(ghostDiv);
 }
+
 if (pacmanAlive) {
   renderPacman();
 }
@@ -146,6 +157,14 @@ function gameLoop() {
         .querySelector(".pellet")
         ?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
+      ghost.mode = "frightened";
+
+      setTimeout(() => {
+        if (gameState === "running" || gameState === "paused") {
+          ghost.mode = "normal";
+        }
+      }, 3000);
+
       score += 50;
       checkWin();
     }
@@ -155,25 +174,46 @@ function gameLoop() {
     }
   }
 
-  cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove();
-  const validGhostDirections = getValidGhostDir(ghostPos);
+  cellElement[ghost.position.row][ghost.position.col]
+    .querySelector(".ghost")
+    ?.remove();
+  const validGhostDirections = getValidGhostDir(ghost.position);
   const randomGhostDir = getRandomGhostDir(validGhostDirections);
 
-  ghostPos = getNewPosition(ghostPos, randomGhostDir);
+  ghost.position = getNewPosition(ghost.position, randomGhostDir);
   renderGhost();
 
-  if (ghostPos.row === pacmanPos.row && ghostPos.col === pacmanPos.col) {
-    if (pacmanAlive) {
+  if (
+    ghost.position.row === pacmanPos.row &&
+    ghost.position.col === pacmanPos.col
+  ) {
+    //checks if the pacman is "powered" up
+    if (
+      ghost.mode === "frightened" &&
+      ghost.position.row === pacmanPos.row &&
+      ghost.position.col === pacmanPos.col
+    ) {
+      gameState = "paused";
+      cellElement[ghost.position.row][ghost.position.col]
+        .querySelector(".ghost")
+        ?.remove();
+      setTimeout(() => {
+        ghost.position = { row: 3, col: 3 };
+        gameState = "running";
+      }, 1000);
+    } else {
       lives -= 1;
       pacmanAlive = false;
       gameState = "paused";
       cellElement[pacmanPos.row][pacmanPos.col]
         .querySelector(".pacman")
         ?.remove();
-      cellElement[ghostPos.row][ghostPos.col].querySelector(".ghost")?.remove();
+      cellElement[ghost.position.row][ghost.position.col]
+        .querySelector(".ghost")
+        ?.remove();
       setTimeout(() => {
         pacmanPos = { row: 7, col: 5 };
-        ghostPos = { row: 3, col: 3 };
+        ghost.position = { row: 3, col: 3 };
         pacmanAlive = true;
         gameState = "running";
       }, 1000);
@@ -184,6 +224,7 @@ function gameLoop() {
     pacmanAlive = false;
     gameState = "gameOver";
     clearInterval(interval);
+    interval = null;
     return (gameOverDiv.textContent = "Game Over :(");
   }
 
