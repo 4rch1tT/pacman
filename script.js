@@ -225,7 +225,10 @@ function gameLoop() {
     gameState = "gameOver";
     clearInterval(interval);
     interval = null;
-    return (gameOverDiv.textContent = "Game Over :(");
+    return (
+      (gameOverDiv.style.backdropFilter = "blur(10px)"),
+      (gameOverDiv.textContent = "Game Over :(")
+    );
   }
 
   livesDiv.textContent = "Lives:" + lives;
@@ -278,6 +281,9 @@ function checkWin() {
   if (!gridArray.flat().some((cell) => cell === 2 || cell === 3)) {
     gameState = "youWin";
     clearInterval(interval);
-    return (youWinDiv.textContent = "You Win ;)");
+    return (
+      (youWinDiv.style.backdropFilter = "blur(10px)"),
+      (youWinDiv.textContent = "You Win ;)")
+    );
   }
 }
