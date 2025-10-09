@@ -67,6 +67,17 @@ function renderBoard(grid) {
           break;
         case 1:
           cell.classList.add("wall");
+          if (row > 0 && grid[row - 1][col] !== 1)
+            cell.style.borderTop = "3px solid blue";
+
+          if (row < grid.length - 1 && grid[row + 1][col] !== 1)
+            cell.style.borderBottom = "3px solid blue";
+
+          if (col > 0 && grid[row][col - 1] !== 1)
+            cell.style.borderLeft = "3px solid blue";
+
+          if (col < grid[row].length - 1 && grid[row][col + 1] !== 1)
+            cell.style.borderRight = "3px solid blue";
           break;
         case 2:
           const dot = document.createElement("div");
@@ -232,7 +243,7 @@ function gameLoop() {
   }
 
   livesDiv.textContent = "Lives:" + lives;
-  scoreDiv.textContent = "Score:" + score;
+  scoreDiv.textContent = score;
 }
 
 // function to check if the pacman can move

@@ -19,6 +19,8 @@
   grid-template-rows: repeat(10, 30px);
   background: #000;
   position: relative;
+  border: 3px solid blue;
+  border-radius: 4px;
 }
 
 .cell {
@@ -35,23 +37,25 @@
 }
 
 .wall {
-  background-color: blue;
+  background: transparent;
+  box-sizing: border-box;
   height: 100%;
   width: 100%;
 }
 
 .dot {
   background-color: burlywood;
-  height: 6px;
-  width: 6px;
+  height: 4px;
+  width: 4px;
   border-radius: 50px;
 }
 
 .pellet {
   background-color: blanchedalmond;
-  height: 10px;
-  width: 10px;
+  height: 12px;
+  width: 12px;
   border-radius: 50px;
+  animation: blink-animation 0.5s steps(1, start) infinite;
 }
 
 .pacman {
@@ -97,4 +101,33 @@
   width: 300px;
   font-size: 2rem;
   color: greenyellow;
+}
+
+#lives {
+  color: yellow;
+}
+
+#score {
+  color: yellow;
+}
+
+body {
+  font-family: "Pixelify Sans", sans-serif;
+  background: #000;
+}
+
+h1 {
+  color: yellow;
+}
+
+@keyframes blink-animation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
