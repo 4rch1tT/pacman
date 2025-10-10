@@ -108,6 +108,12 @@ function renderPacman() {
   const pacCell = cellElement[pacmanPos.row][pacmanPos.col];
   const pacDiv = document.createElement("div");
   pacDiv.classList.add("pacman");
+  
+  if (currentPacDirection === "up") pacDiv.style.transform = "rotate(270deg)";
+  if (currentPacDirection === "down") pacDiv.style.transform = "rotate(90deg)";
+  if (currentPacDirection === "left") pacDiv.style.transform = "rotate(180deg)";
+  if (currentPacDirection === "right") pacDiv.style.transform = "rotate(0deg)";
+
   pacCell.appendChild(pacDiv);
 }
 
