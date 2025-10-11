@@ -108,7 +108,7 @@ function renderPacman() {
   const pacCell = cellElement[pacmanPos.row][pacmanPos.col];
   const pacDiv = document.createElement("div");
   pacDiv.classList.add("pacman");
-  
+
   if (currentPacDirection === "up") pacDiv.style.transform = "rotate(270deg)";
   if (currentPacDirection === "down") pacDiv.style.transform = "rotate(90deg)";
   if (currentPacDirection === "left") pacDiv.style.transform = "rotate(180deg)";
@@ -146,6 +146,8 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "ArrowLeft") nextPacDirection = "left";
   if (event.key === "ArrowRight") nextPacDirection = "right";
 });
+
+updateLivesUI();
 
 function gameLoop() {
   if (gameState !== "running") {
@@ -220,6 +222,7 @@ function gameLoop() {
       }, 1000);
     } else {
       lives -= 1;
+      updateLivesUI();
       pacmanAlive = false;
       gameState = "paused";
       cellElement[pacmanPos.row][pacmanPos.col]
@@ -242,13 +245,13 @@ function gameLoop() {
     gameState = "gameOver";
     clearInterval(interval);
     interval = null;
+    updateLivesUI();
     return (
       (gameOverDiv.style.backdropFilter = "blur(10px)"),
       (gameOverDiv.textContent = "Game Over :(")
     );
   }
 
-  livesDiv.textContent = "Lives:" + lives;
   scoreDiv.textContent = score;
 }
 
@@ -302,5 +305,15 @@ function checkWin() {
       (youWinDiv.style.backdropFilter = "blur(10px)"),
       (youWinDiv.textContent = "You Win ;)")
     );
+  }
+}
+
+//function to update the livesUI (render pacman minis as lifes)
+function updateLivesUI() {
+  livesDiv.innerHTML = "";
+  for (let i = 0; i < lives; i++) {
+    const lifePacman = document.createElement("div");
+    lifePacman.classList.add("life-pacman");
+    livesDiv.appendChild(lifePacman);
   }
 }

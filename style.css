@@ -1,9 +1,16 @@
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   justify-items: center;
   align-items: center;
-  min-height: screen;
 }
 
 .header {
@@ -78,11 +85,28 @@
 }
 
 .ghost {
+  position: relative;
   background-color: aqua;
   height: 20px;
   width: 20px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 60px;
+  border-top-right-radius: 60px;
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 80%,
+    90% 100%,
+    80% 80%,
+    70% 100%,
+    60% 80%,
+    50% 100%,
+    40% 80%,
+    30% 100%,
+    20% 80%,
+    10% 100%,
+    0% 80%
+  );
+  animation: float 1s ease-in-out infinite;
 }
 
 #game-over {
@@ -91,11 +115,11 @@
   align-items: center;
   position: absolute;
   text-align: center;
-  top: 120px;
-  left: 545px;
+  top: 315px;
+  left: 530px;
   z-index: 4;
-  height: 300px;
-  width: 300px;
+  height: 320px;
+  width: 320px;
   font-size: 2rem;
   color: crimson;
 }
@@ -106,17 +130,36 @@
   align-items: center;
   position: absolute;
   text-align: center;
-  top: 120px;
-  left: 545px;
+  top: 315px;
+  left: 530px;
   z-index: 4;
-  height: 300px;
-  width: 300px;
+  height: 320px;
+  width: 320px;
   font-size: 2rem;
   color: greenyellow;
 }
 
 #lives {
-  color: yellow;
+  display: flex;
+  align-items: center;
+}
+
+.life-pacman {
+  background-color: yellow;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 4px;
+}
+
+.life-pacman::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  clip-path: polygon(50% 50%, 100% 0%, 100% 100%);
 }
 
 #score {
@@ -151,5 +194,15 @@ h1 {
   }
   50% {
     clip-path: polygon(50% 50%, 100% 40%, 100% 60%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
