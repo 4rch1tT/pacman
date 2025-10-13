@@ -3,7 +3,7 @@ let gridArray = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 3, 2, 2, 2, 2, 2, 2, 3, 1],
   [1, 2, 1, 1, 2, 1, 1, 2, 2, 1],
-  [1, 2, 1, 0, 2, 2, 1, 2, 2, 1],
+  [1, 2, 1, 0, 0, 0, 1, 2, 2, 1],
   [1, 2, 1, 1, 1, 2, 1, 1, 2, 1],
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
   [1, 2, 1, 1, 1, 2, 1, 1, 2, 1],
@@ -15,10 +15,23 @@ let boardDiv = document.getElementById("board");
 let cellElement = []; // for references. eg: cellElement[1][1] will be the pellet div no need to loop through to find the elements
 
 let pacmanPos = { row: 7, col: 5 };
-let ghost = {
-  position: { row: 3, col: 3 },
-  mode: "normal",
-};
+let ghosts = [
+  {
+    position: { row: 3, col: 3 },
+    mode: "normal",
+    color: "aqua",
+  },
+  {
+    position: { row: 3, col: 4 },
+    mode: "normal",
+    color: "red",
+  },
+  {
+    position: { row: 3, col: 5 },
+    mode: "normal",
+    color: "orange",
+  },
+];
 
 let pacmanAlive = true;
 let gameState = "running";
@@ -117,24 +130,25 @@ function renderPacman() {
   pacCell.appendChild(pacDiv);
 }
 
-function renderGhost() {
-  const ghostCell = cellElement[ghost.position.row][ghost.position.col];
-  const ghostDiv = document.createElement("div");
-  ghostDiv.classList.add("ghost");
+function renderGhosts() {
+  document.querySelectorAll(".ghost").forEach((g) => g.remove());
+  ghosts.forEach((ghost) => {
+    const ghostCell = cellElement[ghost.position.row][ghost.position.col];
+    const ghostDiv = document.createElement("div");
+    ghostDiv.classList.add("ghost");
+    ghostDiv.style.backgroundColor = ghost.color;
+    ghostCell.appendChild(ghostDiv);
 
-  if (ghost.mode === "frightened") {
-    ghostDiv.style.backgroundColor = "#FF1493";
-  } else {
-    ghostDiv.style.backgroundColor = "aqua";
-  }
-
-  ghostCell.appendChild(ghostDiv);
+    if (ghost.mode === "frightened") {
+      ghostDiv.style.backgroundColor = "#FF1493";
+    }
+  });
 }
 
 if (pacmanAlive) {
   renderPacman();
 }
-renderGhost();
+renderGhosts();
 
 // setting keyboard events
 document.addEventListener("keydown", (event) => {
@@ -176,12 +190,16 @@ function gameLoop() {
         .querySelector(".pellet")
         ?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
-      ghost.mode = "frightened";
+      ghosts.forEach((ghost) => {
+        ghost.mode = "frightened";
+      });
 
       setTimeout(() => {
-        if (gameState === "running" || gameState === "paused") {
-          ghost.mode = "normal";
-        }
+        ghosts.forEach((ghost) => {
+          if (gameState === "running" || gameState === "paused") {
+            ghost.mode = "normal";
+          }
+        });
       }, 3000);
 
       score += 50;
@@ -193,52 +211,56 @@ function gameLoop() {
     }
   }
 
-  cellElement[ghost.position.row][ghost.position.col]
-    .querySelector(".ghost")
-    ?.remove();
-  const validGhostDirections = getValidGhostDir(ghost.position);
-  const randomGhostDir = getRandomGhostDir(validGhostDirections);
+  ghosts.forEach((ghost) => {
+    cellElement[ghost.position.row][ghost.position.col]
+      .querySelector(".ghost")
+      ?.remove();
+    const validGhostDirections = getValidGhostDir(ghost.position);
+    const randomGhostDir = getRandomGhostDir(validGhostDirections);
 
-  ghost.position = getNewPosition(ghost.position, randomGhostDir);
-  renderGhost();
+    ghost.position = getNewPosition(ghost.position, randomGhostDir);
+  });
+  renderGhosts();
 
-  if (
-    ghost.position.row === pacmanPos.row &&
-    ghost.position.col === pacmanPos.col
-  ) {
-    //checks if the pacman is "powered" up
+  ghosts.forEach((ghost) => {
     if (
-      ghost.mode === "frightened" &&
       ghost.position.row === pacmanPos.row &&
       ghost.position.col === pacmanPos.col
     ) {
-      gameState = "paused";
-      cellElement[ghost.position.row][ghost.position.col]
-        .querySelector(".ghost")
-        ?.remove();
-      setTimeout(() => {
-        ghost.position = { row: 3, col: 3 };
-        gameState = "running";
-      }, 1000);
-    } else {
-      lives -= 1;
-      updateLivesUI();
-      pacmanAlive = false;
-      gameState = "paused";
-      cellElement[pacmanPos.row][pacmanPos.col]
-        .querySelector(".pacman")
-        ?.remove();
-      cellElement[ghost.position.row][ghost.position.col]
-        .querySelector(".ghost")
-        ?.remove();
-      setTimeout(() => {
-        pacmanPos = { row: 7, col: 5 };
-        ghost.position = { row: 3, col: 3 };
-        pacmanAlive = true;
-        gameState = "running";
-      }, 1000);
+      //checks if the pacman is "powered" up
+      if (
+        ghost.mode === "frightened" &&
+        ghost.position.row === pacmanPos.row &&
+        ghost.position.col === pacmanPos.col
+      ) {
+        gameState = "paused";
+        cellElement[ghost.position.row][ghost.position.col]
+          .querySelector(".ghost")
+          ?.remove();
+        setTimeout(() => {
+          ghost.position = { row: 3, col: 3 };
+          gameState = "running";
+        }, 1000);
+      } else {
+        lives -= 1;
+        updateLivesUI();
+        pacmanAlive = false;
+        gameState = "paused";
+        cellElement[pacmanPos.row][pacmanPos.col]
+          .querySelector(".pacman")
+          ?.remove();
+        cellElement[ghost.position.row][ghost.position.col]
+          .querySelector(".ghost")
+          ?.remove();
+        setTimeout(() => {
+          pacmanPos = { row: 7, col: 5 };
+          ghosts.forEach((g) => (g.position = { row: 3, col: 3 }));
+          pacmanAlive = true;
+          gameState = "running";
+        }, 1000);
+      }
     }
-  }
+  });
 
   if (lives === 0) {
     pacmanAlive = false;
