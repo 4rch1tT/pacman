@@ -1,36 +1,30 @@
 // this is the map ;)
 let gridArray = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 2, 2, 2, 2, 2, 2, 3, 1],
-  [1, 2, 1, 1, 2, 1, 1, 2, 2, 1],
-  [1, 2, 1, 0, 0, 0, 1, 2, 2, 1],
-  [1, 2, 1, 1, 1, 2, 1, 1, 2, 1],
-  [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-  [1, 2, 1, 1, 1, 2, 1, 1, 2, 1],
-  [1, 2, 2, 2, 2, 0, 2, 2, 2, 1],
-  [1, 3, 2, 2, 2, 2, 2, 2, 3, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 3, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 3, 1],
+  [1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1],
+  [1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 2, 1, 2, 2, 1],
+  [1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1],
+  [1, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1],
+  [1, 2, 1, 1, 2, 1, 1, 0, 1, 1, 2, 1, 1, 2, 1],
+  [1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1],
+  [1, 2, 1, 1, 2, 1, 1, 0, 1, 1, 2, 1, 1, 2, 1],
+  [1, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1],
+  [1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1],
+  [1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 2, 1, 2, 2, 1],
+  [1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1],
+  [1, 3, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 3, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
 let boardDiv = document.getElementById("board");
 let cellElement = []; // for references. eg: cellElement[1][1] will be the pellet div no need to loop through to find the elements
 
-let pacmanPos = { row: 7, col: 5 };
+let pacmanPos = { row: 11, col: 7 };
 let ghosts = [
-  {
-    position: { row: 3, col: 3 },
-    mode: "normal",
-    color: "aqua",
-  },
-  {
-    position: { row: 3, col: 4 },
-    mode: "normal",
-    color: "red",
-  },
-  {
-    position: { row: 3, col: 5 },
-    mode: "normal",
-    color: "orange",
-  },
+  { position: { row: 7, col: 6 }, color: "red", mode: "normal" },
+  { position: { row: 7, col: 7 }, color: "pink", mode: "normal" },
+  { position: { row: 7, col: 8 }, color: "cyan", mode: "normal" },
 ];
 
 let pacmanAlive = true;
@@ -253,8 +247,8 @@ function gameLoop() {
           .querySelector(".ghost")
           ?.remove();
         setTimeout(() => {
-          pacmanPos = { row: 7, col: 5 };
-          ghosts.forEach((g) => (g.position = { row: 3, col: 3 }));
+          pacmanPos = { row: 11, col: 7 };
+          ghosts.forEach((g) => (g.position = { row: 7, col: 6 }));
           pacmanAlive = true;
           gameState = "running";
         }, 1000);

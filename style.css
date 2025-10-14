@@ -22,8 +22,8 @@
 
 #board {
   display: grid;
-  grid-template-columns: repeat(10, 30px);
-  grid-template-rows: repeat(10, 30px);
+  grid-template-columns: repeat(15, 30px);
+  grid-template-rows: repeat(15, 30px);
   background: #000;
   position: relative;
   border: 3px solid blue;
@@ -114,11 +114,9 @@
   align-items: center;
   position: absolute;
   text-align: center;
-  top: 290px;
-  left: 530px;
   z-index: 4;
-  height: 320px;
-  width: 320px;
+  height: 100vh;
+  width: 100vh;
   font-size: 2rem;
   color: crimson;
 }
@@ -129,11 +127,9 @@
   align-items: center;
   position: absolute;
   text-align: center;
-  top: 290px;
-  left: 530px;
   z-index: 4;
-  height: 320px;
-  width: 320px;
+  height: 100vh;
+  width: 100vh;
   font-size: 2rem;
   color: greenyellow;
 }
