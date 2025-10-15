@@ -30,6 +30,17 @@
   border-radius: 4px;
 }
 
+#restart {
+  border: none;
+  background: transparent;
+  color: blanchedalmond;
+  z-index: 10;
+}
+
+.fa-arrow-rotate-right {
+  color: blanchedalmond;
+}
+
 .cell {
   width: 30px;
   height: 30px;
