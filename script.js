@@ -31,7 +31,7 @@ let ghosts = [
   {
     position: { row: 7, col: 7 },
     color: "pink",
-    mode: "scatter",
+    mode: "normal",
     lastDirection: null,
   },
   {
@@ -163,7 +163,7 @@ renderGhosts();
 // setting keyboard events
 document.addEventListener("keydown", (event) => {
   if (event.key.startsWith("Arrow") && interval === null) {
-    interval = setInterval(gameLoop, 150);
+    interval = setInterval(gameLoop, 200);
   }
   if (event.key === "ArrowUp") nextPacDirection = "up";
   if (event.key === "ArrowDown") nextPacDirection = "down";
@@ -201,13 +201,14 @@ function gameLoop() {
         ?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       ghosts.forEach((ghost) => {
+        ghost.previousMode = ghost.mode
         ghost.mode = "frightened";
       });
 
       setTimeout(() => {
         ghosts.forEach((ghost) => {
           if (gameState === "running" || gameState === "paused") {
-            ghost.mode = "normal";
+            ghost.mode = ghost.previousMode;
           }
         });
       }, 3000);
@@ -227,7 +228,7 @@ function gameLoop() {
       ?.remove();
     const validGhostDirections = getValidGhostDir(ghost.position);
 
-    if (ghost.mode === "normal") {
+    if (ghost.mode === "normal" || ghost.mode === "frightened") {
       const randomGhostDir = getRandomGhostDir(validGhostDirections);
       ghost.position = getNewPosition(ghost.position, randomGhostDir);
     }
@@ -240,7 +241,8 @@ function gameLoop() {
         validGhostDirections
       );
       ghost.position = getNewPosition(ghost.position, chaseDir);
-      ghost.lastDirection = chaseDir
+      ghost.lastDirection = chaseDir;
+      console.log(chaseDir);
     }
   });
   renderGhosts();
@@ -261,7 +263,7 @@ function gameLoop() {
           .querySelector(".ghost")
           ?.remove();
         setTimeout(() => {
-          ghost.position = { row: 3, col: 3 };
+          ghost.position = { row: 7, col: 6 };
           gameState = "running";
         }, 1000);
       } else {
@@ -359,7 +361,7 @@ function getChaseDir(ghost, pacmanPos, gridArray, validGhostDirections) {
 
   if (directions.length === 0) directions = [...validGhostDirections];
 
-  function hypotheticalPos(dir, pos) {
+  function hypotheticalPos(pos, dir) {
     if (dir === "up") return { row: pos.row - 1, col: pos.col };
     if (dir === "down") return { row: pos.row + 1, col: pos.col };
     if (dir === "left") return { row: pos.row, col: pos.col - 1 };
