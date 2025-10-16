@@ -22,9 +22,24 @@ let cellElement = []; // for references. eg: cellElement[1][1] will be the pelle
 
 let pacmanPos = { row: 11, col: 7 };
 let ghosts = [
-  { position: { row: 7, col: 6 }, color: "red", mode: "normal" },
-  { position: { row: 7, col: 7 }, color: "pink", mode: "normal" },
-  { position: { row: 7, col: 8 }, color: "cyan", mode: "normal" },
+  {
+    position: { row: 7, col: 6 },
+    color: "red",
+    mode: "chase",
+    lastDirection: null,
+  },
+  {
+    position: { row: 7, col: 7 },
+    color: "pink",
+    mode: "scatter",
+    lastDirection: null,
+  },
+  {
+    position: { row: 7, col: 8 },
+    color: "cyan",
+    mode: "normal",
+    lastDirection: null,
+  },
 ];
 
 let pacmanAlive = true;
@@ -58,7 +73,8 @@ function renderBoard(grid) {
   boardDiv.innerHTML = "";
   cellElement = [];
 
-  const fragment = document.createDocumentFragment(); // similar to the virtual dom in react
+  // similar to the virtual dom in react
+  const fragment = document.createDocumentFragment();
 
   for (let row = 0; row < gridArray.length; row++) {
     let rowCells = [];
@@ -210,9 +226,22 @@ function gameLoop() {
       .querySelector(".ghost")
       ?.remove();
     const validGhostDirections = getValidGhostDir(ghost.position);
-    const randomGhostDir = getRandomGhostDir(validGhostDirections);
 
-    ghost.position = getNewPosition(ghost.position, randomGhostDir);
+    if (ghost.mode === "normal") {
+      const randomGhostDir = getRandomGhostDir(validGhostDirections);
+      ghost.position = getNewPosition(ghost.position, randomGhostDir);
+    }
+
+    if (ghost.mode === "chase") {
+      const chaseDir = getChaseDir(
+        ghost,
+        pacmanPos,
+        gridArray,
+        validGhostDirections
+      );
+      ghost.position = getNewPosition(ghost.position, chaseDir);
+      ghost.lastDirection = chaseDir
+    }
   });
   renderGhosts();
 
@@ -309,6 +338,56 @@ function getRandomGhostDir(validGhostDirections) {
   const randomIndex = Math.floor(Math.random() * validGhostDirections.length);
 
   return validGhostDirections[randomIndex];
+}
+
+function getChaseDir(ghost, pacmanPos, gridArray, validGhostDirections) {
+  let directions = [...validGhostDirections];
+
+  const opposite = {
+    up: "down",
+    down: "up",
+    left: "right",
+    right: "left",
+  };
+
+  if (ghost.lastDirection) {
+    const filtered = directions.filter(
+      (dir) => dir !== opposite[ghost.lastDirection]
+    );
+    if (filtered.length > 0) directions = filtered;
+  }
+
+  if (directions.length === 0) directions = [...validGhostDirections];
+
+  function hypotheticalPos(dir, pos) {
+    if (dir === "up") return { row: pos.row - 1, col: pos.col };
+    if (dir === "down") return { row: pos.row + 1, col: pos.col };
+    if (dir === "left") return { row: pos.row, col: pos.col - 1 };
+    if (dir === "right") return { row: pos.row, col: pos.col + 1 };
+    return pos;
+  }
+
+  let bestDir = directions[0];
+  let bestDist = Infinity;
+  const bestPaths = [];
+
+  for (const dir of directions) {
+    const nextPos = hypotheticalPos(ghost.position, dir);
+    const dist =
+      Math.abs(nextPos.row - pacmanPos.row) +
+      Math.abs(nextPos.col - pacmanPos.col);
+
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestPaths.length = 0;
+      bestPaths.push(dir);
+    } else if (dist === bestDist) {
+      bestPaths.push(dir);
+    }
+  }
+
+  const choice = bestPaths[Math.floor(Math.random() * bestPaths.length)];
+  return choice;
 }
 
 //function to check if there's any dot or pellet left
