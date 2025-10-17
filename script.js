@@ -26,18 +26,21 @@ let ghosts = [
     position: { row: 7, col: 6 },
     color: "red",
     mode: "chase",
+    scatterTarget: { row: 1, col: 13 },
     lastDirection: null,
   },
   {
     position: { row: 7, col: 7 },
     color: "pink",
-    mode: "normal",
+    mode: "scatter",
+    scatterTarget: { row: 1, col: 1 },
     lastDirection: null,
   },
   {
     position: { row: 7, col: 8 },
     color: "cyan",
     mode: "normal",
+    scatterTarget: { row: 13, col: 13 },
     lastDirection: null,
   },
 ];
@@ -201,7 +204,7 @@ function gameLoop() {
         ?.remove();
       gridArray[pacmanPos.row][pacmanPos.col] = 0;
       ghosts.forEach((ghost) => {
-        ghost.previousMode = ghost.mode
+        ghost.previousMode = ghost.mode;
         ghost.mode = "frightened";
       });
 
@@ -231,6 +234,7 @@ function gameLoop() {
     if (ghost.mode === "normal" || ghost.mode === "frightened") {
       const randomGhostDir = getRandomGhostDir(validGhostDirections);
       ghost.position = getNewPosition(ghost.position, randomGhostDir);
+      ghost.lastDirection = randomGhostDir;
     }
 
     if (ghost.mode === "chase") {
@@ -242,9 +246,28 @@ function gameLoop() {
       );
       ghost.position = getNewPosition(ghost.position, chaseDir);
       ghost.lastDirection = chaseDir;
-      console.log(chaseDir);
+    }
+
+    //scatter logic(if the mode is scatter it will move towards the scatter target set in the ghost object)
+    if (ghost.mode === "scatter") {
+      const scatterDir = getChaseDir(
+        ghost,
+        ghost.scatterTarget,
+        gridArray,
+        validGhostDirections
+      );
+      ghost.position = getNewPosition(ghost.position, scatterDir);
+      ghost.lastDirection = scatterDir;
     }
   });
+
+  // change chase and scatter alternatively every 7s
+  setInterval(() => {
+    ghosts.forEach((ghost) => {
+      if (ghost.mode === "chase") ghost.mode = "scatter";
+      else if (ghost.mode === "scatter") ghost.mode = "chase";
+    });
+  }, 7000);
   renderGhosts();
 
   ghosts.forEach((ghost) => {
@@ -335,14 +358,15 @@ function getValidGhostDir(ghostPos) {
   return ghostDirections;
 }
 
-// function to take one random direcrion from the validDirections array
+// function to take one random direcrion from the validDirections array(ghost)
 function getRandomGhostDir(validGhostDirections) {
   const randomIndex = Math.floor(Math.random() * validGhostDirections.length);
 
   return validGhostDirections[randomIndex];
 }
 
-function getChaseDir(ghost, pacmanPos, gridArray, validGhostDirections) {
+//function to set the chase direction for the red ghost
+function getChaseDir(ghost, targetPos, gridArray, validGhostDirections) {
   let directions = [...validGhostDirections];
 
   const opposite = {
@@ -375,9 +399,11 @@ function getChaseDir(ghost, pacmanPos, gridArray, validGhostDirections) {
 
   for (const dir of directions) {
     const nextPos = hypotheticalPos(ghost.position, dir);
+
+    //manhattan distance concept
     const dist =
-      Math.abs(nextPos.row - pacmanPos.row) +
-      Math.abs(nextPos.col - pacmanPos.col);
+      Math.abs(nextPos.row - targetPos.row) +
+      Math.abs(nextPos.col - targetPos.col);
 
     if (dist < bestDist) {
       bestDist = dist;
