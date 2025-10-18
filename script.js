@@ -23,6 +23,7 @@ let cellElement = []; // for references. eg: cellElement[1][1] will be the pelle
 let pacmanPos = { row: 11, col: 7 };
 let ghosts = [
   {
+    type: "blinky",
     position: { row: 7, col: 6 },
     color: "red",
     mode: "chase",
@@ -30,6 +31,7 @@ let ghosts = [
     lastDirection: null,
   },
   {
+    type: "pinky",
     position: { row: 7, col: 7 },
     color: "pink",
     mode: "scatter",
@@ -37,6 +39,7 @@ let ghosts = [
     lastDirection: null,
   },
   {
+    type: "inky",
     position: { row: 7, col: 8 },
     color: "cyan",
     mode: "normal",
@@ -176,6 +179,14 @@ document.addEventListener("keydown", (event) => {
 
 updateLivesUI();
 
+// change chase and scatter alternatively every 7s
+setInterval(() => {
+  ghosts.forEach((ghost) => {
+    if (ghost.mode === "chase") ghost.mode = "scatter";
+    else if (ghost.mode === "scatter") ghost.mode = "chase";
+  });
+}, 7000);
+
 function gameLoop() {
   if (gameState !== "running") {
     return;
@@ -261,13 +272,6 @@ function gameLoop() {
     }
   });
 
-  // change chase and scatter alternatively every 7s
-  setInterval(() => {
-    ghosts.forEach((ghost) => {
-      if (ghost.mode === "chase") ghost.mode = "scatter";
-      else if (ghost.mode === "scatter") ghost.mode = "chase";
-    });
-  }, 7000);
   renderGhosts();
 
   ghosts.forEach((ghost) => {
