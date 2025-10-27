@@ -46,6 +46,14 @@ let ghosts = [
     scatterTarget: { row: 13, col: 13 },
     lastDirection: null,
   },
+  {
+    type: "clyde",
+    position: { row: 7, col: 9 },
+    color: "orange",
+    mode: "scatter",
+    scatterTarget: { row: 13, col: 1 },
+    lastDirection: null,
+  },
 ];
 
 let pacmanAlive = true;
@@ -242,13 +250,33 @@ function gameLoop() {
       ?.remove();
     const validGhostDirections = getValidGhostDir(ghost.position);
 
-    if (ghost.mode === "normal" || ghost.mode === "frightened") {
+    // clyde logic
+    if (ghost.type === "clyde") {
+      const dist =
+        Math.abs(ghost.position.row - pacmanPos.row) +
+        Math.abs(ghost.position.col - pacmanPos.col);
+
+      let target;
+
+      if (dist > 8) {
+        target = pacmanPos;
+      } else {
+        target = ghost.scatterTarget;
+      }
+
+      const clydeDir = getChaseDir(
+        ghost,
+        target,
+        gridArray,
+        validGhostDirections
+      );
+      ghost.position = getNewPosition(ghost.position, clydeDir);
+      ghost.lastDirection = clydeDir;
+    } else if (ghost.mode === "normal" || ghost.mode === "frightened") {
       const randomGhostDir = getRandomGhostDir(validGhostDirections);
       ghost.position = getNewPosition(ghost.position, randomGhostDir);
       ghost.lastDirection = randomGhostDir;
-    }
-
-    if (ghost.mode === "chase") {
+    } else if (ghost.mode === "chase") {
       const chaseDir = getChaseDir(
         ghost,
         pacmanPos,
@@ -257,10 +285,7 @@ function gameLoop() {
       );
       ghost.position = getNewPosition(ghost.position, chaseDir);
       ghost.lastDirection = chaseDir;
-    }
-
-    //scatter logic(if the mode is scatter it will move towards the scatter target set in the ghost object)
-    if (ghost.mode === "scatter") {
+    } else if (ghost.mode === "scatter") { //scatter logic(if the mode is scatter it will move towards the scatter target set in the ghost object)
       const scatterDir = getChaseDir(
         ghost,
         ghost.scatterTarget,
