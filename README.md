@@ -38,4 +38,7 @@ A classic Pac-Man game implementation using vanilla JavaScript, HTML, and CSS.
 - `script.js` - Game logic and mechanics
 - `style.css` - Game styling and layout
 
+## Live Link
+https://pacman-theta-ruddy.vercel.app
+
 Enjoy the game! 🎮
